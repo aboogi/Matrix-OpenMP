@@ -1,0 +1,28 @@
+Size matrixs: [1024 x 1024]
+Count of elements: 1048576
+
+Count of threads: 1
+Simple mult - Time: 1356493
+Simple mult OMP - Time: 1427257
+
+Count of threads: 2
+Simple mult OMP - Time: 741641
+
+Count of threads: 3
+Simple mult OMP - Time: 632746
+
+Count of threads: 4
+Simple mult OMP - Time: 775289
+
+Count of threads: 5
+Simple mult OMP - Time: 622368
+
+Count of threads: 6
+Simple mult OMP - Time: 683778
+
+Count of threads: 7
+Simple mult OMP - Time: 743680
+
+Count of threads: 8
+Simple mult OMP - Time: 1014233
+
