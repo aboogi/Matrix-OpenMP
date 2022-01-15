@@ -4,19 +4,10 @@
 #include <vector>
 #include <iostream>
 
-#include "omp.h"
-
 using namespace std;
 
 namespace stras_2d
 {
-	struct Matrix {
-        vector<vector<long>> M11;
-        vector<vector<long>> M12;
-        vector<vector<long>> M21;
-        vector<vector<long>> M22;
-	};
-
 	//Simple matrix mult
 	void matrix_mul_2d(
         std::vector<vector<long>>* mat1,  // матрица А(n*m)
@@ -42,33 +33,25 @@ namespace stras_2d
 	}
 
 	// Summary of matrixs M1 + M2 = ResM
-    vector<vector<long>> sum_matrix_2d(vector<vector<long>>* M1, vector<vector<long>>* M2, size_t n)
+    void sum_matrix_2d(vector<vector<long>>* M1, vector<vector<long>>* M2, vector<vector<long>>* ResM, size_t n)
 	{
-        vector<vector<long>> ResM(n, vector<long>(n));
-
 		for (long i = 0; i < n; i++) {
 			for (long j = 0; j < n; j++)
 			{
-				//cout << "TUT sub_matrix: " << omp_get_num_threads() << endl;
-				ResM[i][j] = (*M1)[i][j] + (*M2)[i][j];
+				(*ResM)[i][j] = (*M1)[i][j] + (*M2)[i][j];
 			}
 		}
-		return ResM;
 	}
 
 
 	// Subtraction of matrixs M1 - M2 = ResM
-    vector<vector<long>> sub_matrix_2d(vector<vector<long>>* M1, vector<vector<long>>* M2, size_t n) {
-        vector<vector<long>> ResM(n, vector<long>(n));
-
-		for (long i = 0; i < n; i++) {
+    void sub_matrix_2d(vector<vector<long>>* M1, vector<vector<long>>* M2, vector<vector<long>>* ResM, size_t n) {
+        for (long i = 0; i < n; i++) {
 			for (long j = 0; j < n; j++)
 			{
-				ResM[i][j] = (*M1)[i][j] - (*M2)[i][j];
+				(*ResM)[i][j] = (*M1)[i][j] - (*M2)[i][j];
 			}
 		}
-
-		return ResM;
 	}
 
 
@@ -129,8 +112,6 @@ namespace stras_2d
 			size_t m_2 = m / 2;
 			size_t k_2 = k / 2;
 
-			Matrix C;
-
             vector<vector<long>> A_M11(n_2, vector<long>(m_2)), A_M12(n_2, vector<long>(m_2)), A_M21(n_2, vector<long>(m_2)), A_M22(n_2, vector<long>(m_2));
             vector<vector<long>> B_M11(n_2, vector<long>(m_2)), B_M12(n_2, vector<long>(m_2)), B_M21(n_2, vector<long>(m_2)), B_M22(n_2, vector<long>(m_2));
             vector<vector<long>> C_M11(n_2, vector<long>(m_2)), C_M12(n_2, vector<long>(m_2)), C_M21(n_2, vector<long>(m_2)), C_M22(n_2, vector<long>(m_2));
@@ -143,67 +124,63 @@ namespace stras_2d
             vector<vector<long>> P6(n_2, vector<long>(m_2));
             vector<vector<long>> P7(n_2, vector<long>(m_2));
 
-            vector<vector<long>> S1;
-            vector<vector<long>> S2;
-            vector<vector<long>> S3;
-            vector<vector<long>> S4;
-            vector<vector<long>> S5;
-            vector<vector<long>> S6;
-            vector<vector<long>> S7;
-            vector<vector<long>> S8;
-            vector<vector<long>> S9;
-            vector<vector<long>> S10;
-
-			//int st = clock();
-//			omp_set_nested(1);
-			////omp_set_num_threads(threads);
-
-			corners(mat1, n, m, &A_M11, &A_M12, &A_M12, &A_M12);
-			corners(mat1, n, m, &B_M11, &B_M12, &B_M12, &B_M12);
+            vector<vector<long>> S1(n_2, vector<long>(m_2));
+			vector<vector<long>> S2(n_2, vector<long>(m_2));
+			vector<vector<long>> S3(n_2, vector<long>(m_2));
+			vector<vector<long>> S4(n_2, vector<long>(m_2));
+			vector<vector<long>> S5(n_2, vector<long>(m_2));
+			vector<vector<long>> S6(n_2, vector<long>(m_2));
+			vector<vector<long>> S7(n_2, vector<long>(m_2));
+            vector<vector<long>> S8(n_2, vector<long>(m_2));
+			vector<vector<long>> S9(n_2, vector<long>(m_2));
+			vector<vector<long>> S10(n_2, vector<long>(m_2));
 
 
-			S1 = sub_matrix_2d(&(B_M12), &(B_M22), n_2);
+			corners(mat1, n, m, &A_M11, &A_M12, &A_M21, &A_M22);
+			corners(mat2, n, m, &B_M11, &B_M12, &B_M21, &B_M22);
+
+
+			sub_matrix_2d(&(B_M12), &(B_M22), &S1, n_2);
 			compute_matrix_strassen_2d(&A_M11, n_2, &S1, n_2, &P1, k_2);
 
-			S2 = sum_matrix_2d(&(A_M11), &(A_M12), n_2);
+			sum_matrix_2d(&(A_M11), &(A_M12), &S2, n_2);
 			compute_matrix_strassen_2d(&S2, n_2, &B_M22, n_2, &P2, k_2);
 
-			S3 = sum_matrix_2d(&(A_M21), &(A_M22), n_2);
+			sum_matrix_2d(&(A_M21), &(A_M22), &S3, n_2);
 			compute_matrix_strassen_2d(&S3, n_2, &B_M11, n_2, &P3, k_2);
 
-			S4 = sub_matrix_2d(&(B_M21), &(B_M11), n_2);
+			sub_matrix_2d(&(B_M21), &(B_M11), &S4, n_2);
 			compute_matrix_strassen_2d(&A_M22, n_2, &S4, n_2, &P4, k_2);
 
-			S5 = sum_matrix_2d(&(A_M11), &(A_M22), n_2);
-			S6 = sum_matrix_2d(&(B_M11), &(B_M22), n_2);
+			sum_matrix_2d(&(A_M11), &(A_M22), &S5, n_2);
+			sum_matrix_2d(&(B_M11), &(B_M22), &S6, n_2);
 			compute_matrix_strassen_2d(&S5, n_2, &S6, n_2, &P5, k_2);
 
-			S7 = sub_matrix_2d(&(A_M12), &(A_M22), n_2);
-			S8 = sum_matrix_2d(&(B_M21), &(B_M22), n_2);
+			sub_matrix_2d(&(A_M12), &(A_M22), &S7, n_2);
+			sum_matrix_2d(&(B_M21), &(B_M22), &S8, n_2);
 			compute_matrix_strassen_2d(&S7, n_2, &S8, n_2, &P6, k_2);
 
-			S9 = sub_matrix_2d(&(A_M11), &(A_M21), n_2);
-			S10 = sum_matrix_2d(&(B_M11), &(B_M12), n_2);
+			sub_matrix_2d(&(A_M11), &(A_M21), &S9, n_2);
+			sum_matrix_2d(&(B_M11), &(B_M12), &S10, n_2);
 			compute_matrix_strassen_2d(&S9, n_2, &S10, n_2, &P7, k_2);
 
-
-            vector<vector<long>> sum1 = sum_matrix_2d(&P5, &P4, n_2);
-            vector<vector<long>> sub1 = sub_matrix_2d(&P6, &P2, n_2);
-
-            vector<vector<long>> sum2 = sum_matrix_2d(&P5, &P1, n_2);
-            vector<vector<long>> sum3 = sum_matrix_2d(&P3, &P7, n_2);
-
-			C_M11 = sum_matrix_2d(&sum1, &sub1, n_2);
-			C_M12 = sum_matrix_2d(&P1, &P2, n_2);
-			C_M21 = sum_matrix_2d(&P3, &P4, n_2);
-			C_M22 = sub_matrix_2d(&sum2, &sum3, n_2);
+			vector<vector<long>> sum1(n_2, vector<long>(m_2));
+			vector<vector<long>> sub1(n_2, vector<long>(m_2));
+			vector<vector<long>> sum2(n_2, vector<long>(m_2));
+			vector<vector<long>> sum3(n_2, vector<long>(m_2));
 
 
-			//fill_result_matrix(&C, mat_res, n);
-			//fill_left_up_corner(&C_M11, n, mat_res);
-			//fill_right_up_corner(&C_M12, n, mat_res);
-			//fill_left_down_corner(&C_M21, n, mat_res);
-			//fill_right_down_corner(&C_M22, n, mat_res);
+            sum_matrix_2d(&P5, &P4, &sum1, n_2);
+			sub_matrix_2d(&P2, &P6, &sub1, n_2);
+
+			sum_matrix_2d(&P5, &P1, &sum2, n_2);
+			sum_matrix_2d(&P3, &P7, &sum3, n_2);
+
+			sub_matrix_2d(&sum1, &sub1, &C_M11, n_2);
+			sum_matrix_2d(&P1, &P2, &C_M12, n_2);
+			sum_matrix_2d(&P3, &P4, &C_M21, n_2);
+			sub_matrix_2d(&sum2, &sum3, &C_M22, n_2);
+
 
 			fill_corners(&C_M11, &C_M12, &C_M21, &C_M22, n, mat_res);
 		}

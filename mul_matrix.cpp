@@ -130,7 +130,7 @@ void compute_2d()
 
             // Matrix Strassen 2d
             begin = std::chrono::steady_clock::now();
-            matrix_strassen_2d_omp(&mat1, m, &mat2, n, &mres4, k, th);
+            matrix_strassen_2d_omp(mat1, m, mat2, n, mres4, k, th);
             end = std::chrono::steady_clock::now();
 
             fout <<  "Matrix Strassen OMP - Time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "\n";
@@ -138,23 +138,23 @@ void compute_2d()
 
             fout << std::endl;
 
-            // for (size_t i = 0; i < n; ++i) {
-            //     for (size_t j = 0; j < m; ++j) {
-            //         // cout << mres1[i*mr_m + j] << " ";
-            //         if (mres1[i][j] != mres2[i][j]) {
-            //             cout << mres1[i][j] << " " << mres2[i][j] << endl;
-            //             cerr << "Error?";
-            //             break;
-            //         }
-            //     }
-            //     //cout << endl;
-            // }
+            for (size_t i = 0; i < n; ++i) {
+                for (size_t j = 0; j < m; ++j) {
+                    // cout << mres1[i*mr_m + j] << " ";
+                    if (mres1[i][j] != mres3[i][j]) {
+                        cout << mres1[i][j] << " " << mres3[i][j] << i << " " << j << endl;
+                        cerr << "Error?";
+                        break;
+                    }
+                }
+                //cout << endl;
+            }
             for (size_t i = 0; i < n; ++i) {
                 for (size_t j = 0; j < m; ++j) {
                     // cout << mres1[i*mr_m + j] << " ";
                     if (mres3[i][j] != mres4[i][j]) {
-                        cout << mres3[i][j] << " " << mres4[i][j] << endl;
-                        cerr << "Error?";
+                        cout << mres3[i][j] << " " << mres4[i][j] << i << " " << j << endl;
+                        cerr << "Error? ";
                         break;
                     }
                 }
@@ -229,7 +229,7 @@ void compute_1d()
             cout << "Count of threads: " << th << "\n";
             cout << "[n x m]: [" << n << " x " << m << " ]" << endl;
 
-            fprintf(outf, "Size matrixs: [%d x %d]\nCount of elements: %d\n", m, k, m * k);
+            fprintf(outf, "Size matrixs: [%ld x %ld]\nCount of elements: %d\n", m, k, m * k);
 
             if (!outf) {
                 cerr << "Uh oh, res_time_compute.txt could not be opened for writing!" << endl;

@@ -103,17 +103,12 @@ void matrix_mul_2d_omp(
     size_t mr_m,
     int threads)
 {
-    long sum;
-
-    long i(0)/*, j(0), k(0);*/;
-    // omp_set_dynamic(0);
+    long i(0);
     omp_set_num_threads(threads);
 
-#pragma omp parallel private(i/*, j, k, sum*/) shared(mat1, mat2, m_res)
+#pragma omp parallel private(i) shared(mat1, mat2, m_res)
     {
-
-        //#pragma omp for schedule (static)
-        printf("(matrix_mul_2d_omp) num_threads = %d\n", omp_get_num_threads());
+        //printf("(matrix_mul_2d_omp) num_threads = %d\n", omp_get_num_threads());
 #pragma omp for
         for (i = 0; i < s1_n; i++)
         {
