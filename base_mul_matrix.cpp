@@ -77,15 +77,12 @@ void matrix_mul_2d(
     size_t mr_m                            // размерность k матрицы C)
 )
 {
-    long sum;
-    long i, j, k;
-
-    for (i = 0; i < s1_n; i++)
+    for (long i = 0; i < s1_n; i++)
     {
-        for (j = 0; j < mr_m; j++)
+        for (long j = 0; j < mr_m; j++)
         {
-            sum = 0;
-            for (k = 0; k < s2_n; k++)
+            long sum = 0;
+            for (long k = 0; k < s2_n; k++)
             {
                 sum += (*mat1)[i][k] * (*mat2)[k][j];
             }
@@ -108,7 +105,7 @@ void matrix_mul_2d_omp(
 
 #pragma omp parallel private(i) shared(mat1, mat2, m_res)
     {
-        //printf("(matrix_mul_2d_omp) num_threads = %d\n", omp_get_num_threads());
+        printf("(matrix_mul_2d_omp) num_threads = %d\n", omp_get_num_threads());
 #pragma omp for
         for (i = 0; i < s1_n; i++)
         {

@@ -22,7 +22,7 @@ void compute_2d();
 
 int main(int argc, char* argv[])
 {
-    // compute_1d();
+    // compute_1d(); // Имеются ошибки в расчете одномерного массива
     compute_2d();
 
     system("pause");
@@ -111,12 +111,12 @@ void compute_2d()
                 std::printf("Simple mul - OK\n");
             }
 
-            // std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-            // matrix_mul_2d_omp(&mat1, m, &mat2, n, &mres2, k, th);
-            // std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            matrix_mul_2d_omp(&mat1, m, &mat2, n, &mres2, k, th);
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-            // fout <<  "Simple mult OMP - Time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "\n";
-            // std::printf("Simple mul OMP - OK\n");
+            fout <<  "Simple mult OMP - Time: " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "\n";
+            std::printf("Simple mul OMP - OK\n");
 
 
             // Matrix Strassen 2d
@@ -139,27 +139,27 @@ void compute_2d()
             fout << std::endl;
 
             for (size_t i = 0; i < n; ++i) {
-                for (size_t j = 0; j < m; ++j) {
-                    // cout << mres1[i*mr_m + j] << " ";
-                    if (mres1[i][j] != mres3[i][j]) {
-                        cout << mres1[i][j] << " " << mres3[i][j] << i << " " << j << endl;
-                        cerr << "Error?";
+               for (size_t j = 0; j < m; ++j) {
+                   // cout << mres1[i*mr_m + j] << " ";
+                   if (mres1[i][j] != mres2[i][j]) {
+                       std::cout << mres1[i][j] << " " << mres2[i][j] << i << " " << j << endl;
+                       cerr << "Error 1 2?";
+                       break;
+                   }
+                   if (mres1[i][j] != mres3[i][j]) {
+                        std::cout << mres3[i][j] << " " << mres4[i][j] << i << " " << j << endl;
+                        cerr << "Error 1 3? ";
                         break;
                     }
-                }
-                //cout << endl;
-            }
-            for (size_t i = 0; i < n; ++i) {
-                for (size_t j = 0; j < m; ++j) {
-                    // cout << mres1[i*mr_m + j] << " ";
                     if (mres3[i][j] != mres4[i][j]) {
-                        cout << mres3[i][j] << " " << mres4[i][j] << i << " " << j << endl;
-                        cerr << "Error? ";
+                        std::cout << mres3[i][j] << " " << mres4[i][j] << i << " " << j << endl;
+                        cerr << "Error 3 4? ";
                         break;
                     }
-                }
-                //cout << endl;
+               }
+               cout << endl;
             }
+            //std::cout << endl;
             std::cout << "OK" << endl;
         }
     }
